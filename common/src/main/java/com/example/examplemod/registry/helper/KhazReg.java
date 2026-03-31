@@ -19,12 +19,12 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public final class Reginald {
+public final class KhazReg {
   private final String modId;
   private final Map<ResourceKey<? extends Registry<?>>, Registrar<?>> registrars = new LinkedHashMap<>();
   private boolean frozen;
 
-  public Reginald(String modId) {
+  public KhazReg(String modId) {
     this.modId = Objects.requireNonNull(modId, "modId");
   }
 
