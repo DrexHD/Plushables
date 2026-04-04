@@ -13,5 +13,41 @@ public final class MainRegistry {
   public static void init() {
     if (initialized) return;
     initialized = true;
+
+    // Define registrations as static fields in this class,
+    // or complete all registration setup here and seal it with reg.freeze() at the end.
+
+    /*
+     Register in dedicated classes and initialize them:
+     ModItems.init();
+     ModBlocks.init();
+     ModSounds.init();
+
+     Register through explicit feature/bootstrap methods:
+     MetalsFeature.register(reg);
+     MachinesFeature.register(reg);
+     WorldgenFeature.register(reg);
+
+     Do conditional registration:
+     if (Services.PLATFORM.isModLoaded("other-mod-id")) {
+       CompatContent.register(reg);
+     }
+     if (MyConfig.enableExtraContent()) {
+       ExtraContent.init();
+     }
+
+     Create non-static registrations and register them:
+     var items = new ModItems(reg);
+     var blocks = new ModBlocks(reg);
+     items.register();
+     blocks.register();
+
+     Avoid late or implicit registration:
+     - do not register from Fabric/NeoForge registry events
+     - do not register when gameplay code first accesses a class
+     - do not rely on accidental classloading
+     */
+
+    reg.freeze();
   }
 }

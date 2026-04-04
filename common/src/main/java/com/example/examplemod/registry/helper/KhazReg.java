@@ -144,7 +144,6 @@ public final class KhazReg {
 
   // Call from Fabric's onInitialize() immediately after ExampleModCommon.init().
   public void registerAllStatic() {
-    frozen = true;
     for (Registrar<?> registrar : registrars.values()) {
       registrar.registerBuiltin();
     }
@@ -153,7 +152,6 @@ public final class KhazReg {
 
   // Call from NeoForge main setup by wiring a RegisterEvent listener with eventBus.addListener(this::registerRegistries), then call MainRegistry.reg.registerNeoForge(event.getRegistry()) there.
   public void registerNeoForge(Registry<?> registry) {
-    frozen = true;
     Registrar<?> registrar = registrars.get(registry.key());
     if (registrar != null) {
       registrar.registerInto(registry);
@@ -286,6 +284,11 @@ public final class KhazReg {
     }
   }
 
+  // Flag to mark registry as frozen
+  public void freeze() {
+    frozen = true;
+  }
+
   private final class Registrar<T> {
     private final ResourceKey<? extends Registry<T>> key;
     private final Registry<T> builtinRegistry;
@@ -324,11 +327,11 @@ public final class KhazReg {
       if (committed) {
         return;
       }
-      committed = true;
       @SuppressWarnings("unchecked") Registry<Object> writable = (Registry<Object>) registry;
       for (Entry<?> entry : entries.values()) {
         Registry.register(writable, entry.id(), entry.get());
       }
+      committed = true;
     }
 
     @SuppressWarnings("unchecked")
