@@ -8,17 +8,17 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 /**
  * NeoForge entrypoint helper for the {@link KhazReg} registry system.
  */
-public final class KhazRegNeoForgeHook {
-  private KhazRegNeoForgeHook() {
+public final class KhazRegNeoForge {
+  private KhazRegNeoForge() {
   }
 
   /**
-   * Call KhazRegNeoForgeHook.init(eventBus) in your NeoForge mod constructor immediately after YourModCommon.init().
+   * Call KhazRegNeoForge.init(eventBus) in your NeoForge mod constructor immediately after YourModCommon.init().
    */
   public static void init(IEventBus eventBus) {
     MainRegistry.init();
-    eventBus.addListener(KhazRegNeoForgeHook::registerRegistries);
-    eventBus.addListener(KhazRegNeoForgeHook::verifyRegistriesRegistered);
+    eventBus.addListener(KhazRegNeoForge::registerRegistries);
+    eventBus.addListener(KhazRegNeoForge::verifyRegistriesRegistered);
   }
 
   private static void registerRegistries(RegisterEvent event) {
