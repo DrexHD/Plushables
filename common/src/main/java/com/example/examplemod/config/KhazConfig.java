@@ -10,6 +10,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * KhazConfig is a simple multiloader config helper class for Khazoda's mods.
+ * Config files are generated and read from {mod_name}.properties files in /config
+ * It's not recommended to use this class yourself. Its structure may change over time and there may be breaking changes.
+ */
 public final class KhazConfig {
   private final String modId;
   private final Path file;
@@ -198,6 +203,7 @@ public final class KhazConfig {
 
   public interface ValueAdapter<T> {
     T parse(String raw, T fallback);
+
     String format(T value);
   }
 
