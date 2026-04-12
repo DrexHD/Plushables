@@ -1,12 +1,12 @@
 package com.example.examplemod.platform;
 
+import com.example.examplemod.config.KhazConfig;
 import com.example.examplemod.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.nio.file.Path;
 
 public class FabricPlatformHelper implements IPlatformHelper {
-
   @Override
   public String getPlatformName() {
     return "Fabric";
@@ -25,5 +25,10 @@ public class FabricPlatformHelper implements IPlatformHelper {
   @Override
   public Path getConfigDirectory() {
     return FabricLoader.getInstance().getConfigDir();
+  }
+
+  @Override
+  public void registerServerConfigSync(KhazConfig config) {
+    FabricConfigSync.registerServerConfigSync(config);
   }
 }

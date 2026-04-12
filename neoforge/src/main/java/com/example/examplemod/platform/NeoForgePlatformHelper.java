@@ -1,5 +1,6 @@
 package com.example.examplemod.platform;
 
+import com.example.examplemod.config.KhazConfig;
 import com.example.examplemod.platform.services.IPlatformHelper;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
@@ -27,5 +28,10 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
   @Override
   public Path getConfigDirectory() {
     return FMLPaths.CONFIGDIR.get();
+  }
+
+  @Override
+  public void registerServerConfigSync(KhazConfig config) {
+    NeoForgeConfigSync.registerServerConfigSync(config);
   }
 }

@@ -20,6 +20,9 @@
         "main": [
             "com.example.examplemod.ExampleModFabric"
         ],
+        "client": [
+            "com.example.examplemod.platform.FabricConfigSyncClient"
+        ],
         "fabric-datagen": [
             "com.example.examplemod.datagen.ExampleModDataGenerator"
         ]
