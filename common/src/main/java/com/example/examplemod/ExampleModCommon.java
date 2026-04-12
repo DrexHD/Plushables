@@ -4,7 +4,7 @@ import com.example.examplemod.config.KhazConfig;
 import com.example.examplemod.platform.Services;
 
 public final class ExampleModCommon {
-  public static final KhazConfig CONFIG = KhazConfig.of(Constants.MOD_ID);
+  public static final KhazConfig CONFIG = KhazConfig.of(Constants.MOD_NAME, Constants.MOD_ID);
 
   private ExampleModCommon() {
   }
