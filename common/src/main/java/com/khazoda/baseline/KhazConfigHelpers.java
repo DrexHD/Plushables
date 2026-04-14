@@ -1,7 +1,7 @@
-package com.example.examplemod.config;
+package com.khazoda.baseline;
 
-import com.example.examplemod.config.KhazConfig.Entry;
-import com.example.examplemod.config.KhazConfig.ValueAdapter;
+import com.khazoda.baseline.KhazConfig.Entry;
+import com.khazoda.baseline.KhazConfig.ValueAdapter;
 
 import java.util.HashSet;
 import java.util.List;

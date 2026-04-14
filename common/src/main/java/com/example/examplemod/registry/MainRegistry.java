@@ -1,7 +1,7 @@
 package com.example.examplemod.registry;
 
 import com.example.examplemod.Constants;
-import com.example.examplemod.registry.helper.KhazReg;
+import com.khazoda.baseline.KhazReg;
 
 public final class MainRegistry {
   public static final KhazReg reg = new KhazReg(Constants.MOD_ID);
@@ -10,8 +10,8 @@ public final class MainRegistry {
   private MainRegistry() {
   }
 
-  public static void init() {
-    if (initialized) return;
+  public static KhazReg init() {
+    if (initialized) return reg;
     initialized = true;
 
     // Define registrations as static fields in this class,
@@ -46,8 +46,9 @@ public final class MainRegistry {
      - do not register from Fabric/NeoForge registry events
      - do not register when gameplay code first accesses a class
      - do not rely on accidental classloading
-     */
+    */
 
     reg.freeze();
+    return reg;
   }
 }

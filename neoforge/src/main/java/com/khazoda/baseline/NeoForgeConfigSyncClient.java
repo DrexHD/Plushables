@@ -1,6 +1,5 @@
-package com.example.examplemod.platform;
+package com.khazoda.baseline;
 
-import com.example.examplemod.config.KhazConfig;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.common.NeoForge;
 

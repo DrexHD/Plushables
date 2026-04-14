@@ -1,4 +1,4 @@
-package com.example.examplemod.registry.helper;
+package com.khazoda.baseline;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;

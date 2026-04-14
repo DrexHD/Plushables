@@ -1,6 +1,6 @@
 package com.example.examplemod.platform.services;
 
-import com.example.examplemod.config.KhazConfig;
+import com.khazoda.baseline.KhazConfig;
 
 import java.nio.file.Path;
 

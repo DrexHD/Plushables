@@ -1,7 +1,8 @@
 package com.example.examplemod;
 
-import com.example.examplemod.registry.helper.KhazRegNeoForge;
-import com.example.examplemod.platform.NeoForgeConfigSync;
+import com.example.examplemod.registry.MainRegistry;
+import com.khazoda.baseline.KhazRegNeoForge;
+import com.khazoda.baseline.NeoForgeConfigSync;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 
@@ -10,7 +11,7 @@ public class ExampleModNeoForge {
 
   public ExampleModNeoForge(IEventBus eventBus) {
     ExampleModCommon.init();
-    NeoForgeConfigSync.registerPayloadHandlers(eventBus);
-    KhazRegNeoForge.init(eventBus);
+    NeoForgeConfigSync.registerPayloadHandlers(eventBus, Constants.CONFIG_SYNC);
+    KhazRegNeoForge.init(eventBus, MainRegistry::init);
   }
 }
