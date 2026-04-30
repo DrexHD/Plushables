@@ -12,5 +12,6 @@ public final class PlushablesCommon {
   public static void init() {
     CONFIG.load();
     Services.PLATFORM.registerServerConfigSync(CONFIG);
+    if (Services.PLATFORM.isModLoaded(Constants.MOD_ID)) Constants.LOG.info("- Plushables Loaded -");
   }
 }
