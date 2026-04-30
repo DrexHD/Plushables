@@ -1,4 +1,4 @@
-package com.example.examplemod.platform.services;
+package com.khazoda.plushables.platform.services;
 
 import com.khazoda.baseline.KhazConfig;
 

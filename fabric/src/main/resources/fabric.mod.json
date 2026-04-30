@@ -18,13 +18,13 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.example.examplemod.ExampleModFabric"
+            "com.khazoda.plushables.PlushablesFabric"
         ],
         "client": [
-            "com.example.examplemod.platform.FabricConfigSyncClient"
+            "com.khazoda.plushables.platform.FabricConfigSyncClient"
         ],
         "fabric-datagen": [
-            "com.example.examplemod.datagen.ExampleModDataGenerator"
+            "com.khazoda.plushables.datagen.PlushablesDataGenerator"
         ]
     },
     "mixins": [

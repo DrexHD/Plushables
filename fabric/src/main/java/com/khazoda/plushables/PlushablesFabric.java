@@ -1,14 +1,14 @@
-package com.example.examplemod;
+package com.khazoda.plushables;
 
-import com.example.examplemod.registry.MainRegistry;
+import com.khazoda.plushables.registry.MainRegistry;
 import com.khazoda.baseline.KhazRegFabric;
 import net.fabricmc.api.ModInitializer;
 
-public class ExampleModFabric implements ModInitializer {
+public class PlushablesFabric implements ModInitializer {
 
   @Override
   public void onInitialize() {
-    ExampleModCommon.init();
+    PlushablesCommon.init();
     KhazRegFabric.init(MainRegistry::init);
   }
 }

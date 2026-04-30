@@ -1,6 +1,6 @@
-package com.example.examplemod.registry;
+package com.khazoda.plushables.registry;
 
-import com.example.examplemod.Constants;
+import com.khazoda.plushables.Constants;
 import com.khazoda.baseline.KhazReg;
 
 public final class MainRegistry {

@@ -1,12 +1,12 @@
-package com.example.examplemod;
+package com.khazoda.plushables;
 
-import com.example.examplemod.platform.Services;
+import com.khazoda.plushables.platform.Services;
 import com.khazoda.baseline.KhazConfig;
 
-public final class ExampleModCommon {
+public final class PlushablesCommon {
   public static final KhazConfig CONFIG = KhazConfig.of(Constants.MOD_NAME, Constants.MOD_ID, Services.PLATFORM.getConfigDirectory());
 
-  private ExampleModCommon() {
+  private PlushablesCommon() {
   }
 
   public static void init() {
