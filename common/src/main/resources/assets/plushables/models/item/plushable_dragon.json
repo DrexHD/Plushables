@@ -1,0 +1,4 @@
+{
+  "parent": "plushables:block/plushable_dragon",
+  "gui_light": "front"
+}

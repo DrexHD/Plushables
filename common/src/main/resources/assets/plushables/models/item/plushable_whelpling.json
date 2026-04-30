@@ -1,0 +1,4 @@
+{
+  "parent": "plushables:block/plushable_whelpling",
+  "gui_light": "front"
+}

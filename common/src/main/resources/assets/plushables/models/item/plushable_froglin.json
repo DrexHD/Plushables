@@ -1,0 +1,4 @@
+{
+  "parent": "plushables:block/plushable_froglin",
+  "gui_light": "front"
+}
