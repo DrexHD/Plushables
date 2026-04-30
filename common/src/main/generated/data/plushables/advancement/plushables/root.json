@@ -1,5 +1,4 @@
 {
-  "parent": "minecraft:recipes/root",
   "criteria": {
     "has_flowers": {
       "conditions": {
@@ -30,17 +29,24 @@
         ]
       },
       "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "minecraft:block/light_gray_wool",
+    "description": {
+      "translate": "advancements.plushables.root.description"
     },
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "plushables:heart_of_gold"
-      },
-      "trigger": "minecraft:recipe_unlocked"
+    "icon": {
+      "id": "plushables:plushable_penguin"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancements.plushables.root.title"
     }
   },
   "requirements": [
     [
-      "has_the_recipe",
       "has_gold_nugget",
       "has_flowers",
       "has_honey_bottle"
@@ -50,5 +56,6 @@
     "recipes": [
       "plushables:heart_of_gold"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

@@ -1,6 +1,7 @@
 package com.khazoda.plushables.datagen;
 
 import com.khazoda.plushables.Constants;
+import com.khazoda.plushables.datagen.provider.PlushablesAdvancementProvider;
 import com.khazoda.plushables.datagen.provider.PlushablesBlockLootTableProvider;
 import com.khazoda.plushables.datagen.provider.PlushablesRecipeProvider;
 import com.khazoda.plushables.datagen.provider.PlushablesVillagerTradeProvider;
@@ -14,6 +15,7 @@ public class PlushablesDataGenerator implements DataGeneratorEntrypoint {
   @Override
   public void onInitializeDataGenerator(FabricDataGenerator generator) {
     var pack = generator.createPack();
+    pack.addProvider(PlushablesAdvancementProvider::new);
     pack.addProvider(PlushablesBlockLootTableProvider::new);
     pack.addProvider(PlushablesRecipeProvider::new);
     pack.addProvider(PlushablesVillagerTradeProvider::new);

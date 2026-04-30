@@ -1,9 +1,12 @@
 package com.khazoda.plushables.datagen.provider;
 
 import com.khazoda.plushables.registry.MainRegistry;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
@@ -11,6 +14,8 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -22,7 +27,23 @@ public class PlushablesRecipeProvider extends FabricRecipeProvider {
 
   @Override
   protected RecipeProvider createRecipeProvider(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
-    return new RecipeProvider(provider, recipeOutput) {
+    RecipeOutput recipesOnly = new RecipeOutput() {
+      @Override
+      public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
+        recipeOutput.accept(id, recipe, null);
+      }
+
+      @Override
+      public Advancement.Builder advancement() {
+        return recipeOutput.advancement();
+      }
+
+      @Override
+      public void includeRootAdvancement() {
+      }
+    };
+
+    return new RecipeProvider(provider, recipesOnly) {
       @Override
       public void buildRecipes() {
         /* ==========[ Heart of Gold ]========== */
@@ -113,7 +134,7 @@ public class PlushablesRecipeProvider extends FabricRecipeProvider {
 
   @Override
   public String getName() {
-    return "";
+    return "Plushables Recipes";
   }
 }
 

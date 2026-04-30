@@ -37,6 +37,61 @@ fabricApi.configureDataGeneration {
     client = true
 }
 
+def generatedDataDir = project(':common').file('src/main/generated/data')
+def generatedNamespaces = ['minecraft', mod_id]
+
+tasks.register('syncGeneratedResourcesToCommonBuild', Sync) {
+    from(generatedDataDir)
+    into(project(':common').layout.buildDirectory.dir('resources/main/data'))
+}
+
+tasks.register('syncGeneratedResourcesToCommonIdea', Sync) {
+    from(generatedDataDir)
+    into(project(':common').layout.projectDirectory.dir('out/main/resources/data'))
+}
+
+tasks.register('cleanGeneratedResourcesFromLoaderOutputs') {
+    doLast {
+        [
+                layout.buildDirectory.dir('resources/main/data').get().asFile,
+                project(':neoforge').layout.buildDirectory.dir('resources/main/data').get().asFile,
+                layout.projectDirectory.dir('out/main/resources/data').asFile,
+                project(':neoforge').layout.projectDirectory.dir('out/main/resources/data').asFile
+        ].each { dataDir ->
+            fileTree(generatedDataDir).visit { details ->
+                if (!details.isDirectory()) {
+                    delete(new File(dataDir, details.relativePath.pathString))
+                }
+            }
+
+            generatedNamespaces.each { namespace ->
+                def namespaceDir = new File(dataDir, namespace)
+                if (!namespaceDir.exists()) {
+                    return
+                }
+
+                fileTree(namespaceDir)
+                    .visit { details ->
+                        if (details.isDirectory()) {
+                            File dir = details.file
+                            if (dir.exists() && dir.listFiles()?.length == 0) {
+                                dir.delete()
+                            }
+                        }
+                    }
+
+                if (namespaceDir.listFiles()?.length == 0) {
+                    namespaceDir.delete()
+                }
+            }
+        }
+    }
+}
+
+tasks.named('runDatagen') {
+    finalizedBy('syncGeneratedResourcesToCommonBuild', 'syncGeneratedResourcesToCommonIdea', 'cleanGeneratedResourcesFromLoaderOutputs')
+}
+
 def exportRoot = rootProject.layout.projectDirectory.dir('export')
 
 tasks.named('jar') {

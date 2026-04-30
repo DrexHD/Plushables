@@ -55,5 +55,12 @@
   "tooltip.plushables.artist": "Artist",
   "tooltip.plushables.created": "Created",
   "item.plushables.heart_of_gold": "§6Heart of Gold",
-  "subtitles.plushables.block.plushable.interact": "Plushable interacted"
+  "subtitles.plushables.block.plushable.interact": "Plushable interacted",
+
+  "advancements.plushables.root.title": "§cP§6l§eu§as§bh§9a§5b§cl§6e§es§r",
+  "advancements.plushables.root.description": "Find an ingredient for a Heart of Gold.",
+  "advancements.plushables.heart_of_gold.title": "Heart of Gold",
+  "advancements.plushables.heart_of_gold.description": "The foundation of every plushable.",
+  "advancements.plushables.collection.title": "#%s - #%s",
+  "advancements.plushables.collection.description": "Collect plushables %s through %s."
 }

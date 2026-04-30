@@ -4,7 +4,9 @@
   "package": "com.khazoda.plushables.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_18",
-  "mixins": [],
+  "mixins": [
+    "AdvancementNodeMixin"
+  ],
   "client": [
     "HumanoidMobRendererMixin",
     "HumanoidModelMixin",
@@ -15,4 +17,3 @@
     "defaultRequire": 1
   }
 }
-
