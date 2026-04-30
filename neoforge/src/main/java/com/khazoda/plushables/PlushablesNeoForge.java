@@ -1,10 +1,11 @@
 package com.khazoda.plushables;
 
-import com.khazoda.plushables.registry.MainRegistry;
 import com.khazoda.baseline.KhazRegNeoForge;
 import com.khazoda.baseline.NeoForgeConfigSync;
+import com.khazoda.plushables.registry.MainRegistry;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
 @Mod(Constants.MOD_ID)
 public class PlushablesNeoForge {
@@ -13,5 +14,12 @@ public class PlushablesNeoForge {
     PlushablesCommon.init();
     NeoForgeConfigSync.registerPayloadHandlers(eventBus, Constants.CONFIG_SYNC);
     KhazRegNeoForge.init(eventBus, MainRegistry::init);
+    eventBus.addListener(this::onBuildCreativeModeTabContents);
+  }
+
+  private void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsEvent event) {
+    if (MainRegistry.PLUSHABLES_TAB.key().equals(event.getTabKey())) {
+      MainRegistry.addMainTabItems(event::accept);
+    }
   }
 }

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:lily_pad",
+    "minecraft:yellow_wool",
+    "plushables:heart_of_gold"
+  ],
+  "result": {
+    "id": "plushables:plushable_froge"
+  }
+}

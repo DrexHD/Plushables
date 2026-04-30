@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:red_mushroom",
+    "minecraft:white_wool",
+    "plushables:heart_of_gold"
+  ],
+  "result": {
+    "id": "plushables:plushable_shrump"
+  }
+}

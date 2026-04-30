@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:potato",
+    "minecraft:pink_wool",
+    "plushables:heart_of_gold"
+  ],
+  "result": {
+    "id": "plushables:plushable_big_tater"
+  }
+}

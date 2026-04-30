@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:snowball",
+    "minecraft:white_wool",
+    "plushables:heart_of_gold"
+  ],
+  "result": {
+    "id": "plushables:plushable_snowie"
+  }
+}

@@ -45,4 +45,9 @@ public interface IPlatformHelper {
   default String getEnvironmentName() {
     return isDevelopmentEnvironment() ? "development" : "production";
   }
+
+  /**
+   * @return true if the code is running on the client, false otherwise
+   */
+  boolean isClientSide();
 }

@@ -5,6 +5,7 @@ import com.khazoda.plushables.platform.services.IPlatformHelper;
 import com.khazoda.baseline.KhazConfig;
 import com.khazoda.baseline.NeoForgeConfigSync;
 import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
 
@@ -35,5 +36,9 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
   @Override
   public void registerServerConfigSync(KhazConfig config) {
     NeoForgeConfigSync.registerServerConfigSync(config, Constants.CONFIG_SYNC);
+  }
+  @Override
+  public boolean isClientSide() {
+    return FMLEnvironment.getDist().isClient();
   }
 }
