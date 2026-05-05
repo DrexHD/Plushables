@@ -2,7 +2,7 @@ package com.khazoda.plushables.platform;
 
 import com.khazoda.plushables.PlushablesCommon;
 import com.khazoda.plushables.Constants;
-import com.khazoda.baseline.FabricConfigSync;
+import com.khazoda.baseline.KhazConfigSyncFabric;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -10,7 +10,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 public class FabricConfigSyncClient implements ClientModInitializer {
   @Override
   public void onInitializeClient() {
-    FabricConfigSync.registerClientboundPayloadType(Constants.CONFIG_SYNC);
+    KhazConfigSyncFabric.registerClientboundPayloadType(Constants.CONFIG_SYNC);
     registerServerConfigReceiver();
     registerDisconnectReloadListener();
   }
