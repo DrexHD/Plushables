@@ -2,8 +2,8 @@ package com.khazoda.plushables.platform;
 
 import com.khazoda.plushables.Constants;
 import com.khazoda.plushables.platform.services.IPlatformHelper;
-import com.khazoda.baseline.KhazConfigSyncFabric;
-import com.khazoda.baseline.KhazConfig;
+import com.khazoda.core.KhazConfigSyncFabric;
+import com.khazoda.core.KhazConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 

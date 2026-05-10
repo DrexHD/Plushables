@@ -2,7 +2,7 @@ package com.khazoda.plushables.platform;
 
 import com.khazoda.plushables.PlushablesCommon;
 import com.khazoda.plushables.Constants;
-import com.khazoda.baseline.KhazConfigSyncFabric;
+import com.khazoda.core.KhazConfigSyncFabric;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

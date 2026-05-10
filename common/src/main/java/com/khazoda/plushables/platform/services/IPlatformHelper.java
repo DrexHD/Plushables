@@ -1,6 +1,6 @@
 package com.khazoda.plushables.platform.services;
 
-import com.khazoda.baseline.KhazConfig;
+import com.khazoda.core.KhazConfig;
 
 import java.nio.file.Path;
 

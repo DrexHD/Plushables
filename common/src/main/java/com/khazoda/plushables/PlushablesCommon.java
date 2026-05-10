@@ -1,7 +1,7 @@
 package com.khazoda.plushables;
 
 import com.khazoda.plushables.platform.Services;
-import com.khazoda.baseline.KhazConfig;
+import com.khazoda.core.KhazConfig;
 
 public final class PlushablesCommon {
   public static final KhazConfig CONFIG = KhazConfig.of(Constants.MOD_NAME, Constants.MOD_ID, Services.PLATFORM.getConfigDirectory());
