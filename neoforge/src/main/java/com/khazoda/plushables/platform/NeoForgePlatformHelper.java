@@ -2,8 +2,8 @@ package com.khazoda.plushables.platform;
 
 import com.khazoda.plushables.Constants;
 import com.khazoda.plushables.platform.services.IPlatformHelper;
-import com.khazoda.core.KhazConfig;
-import com.khazoda.core.KhazConfigSyncNeoForge;
+import com.khazoda.core.config.KhazConfig;
+import com.khazoda.core.config.KhazConfigSyncNeoForge;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLLoader;

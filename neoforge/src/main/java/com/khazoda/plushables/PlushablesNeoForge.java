@@ -1,7 +1,7 @@
 package com.khazoda.plushables;
 
-import com.khazoda.core.KhazRegNeoForge;
-import com.khazoda.core.KhazConfigSyncNeoForge;
+import com.khazoda.core.config.KhazConfigSyncNeoForge;
+import com.khazoda.core.reg.KhazRegNeoForge;
 import com.khazoda.plushables.registry.MainRegistry;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;

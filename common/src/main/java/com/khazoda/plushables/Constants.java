@@ -1,6 +1,6 @@
 package com.khazoda.plushables;
 
-import com.khazoda.core.KhazConfigSync;
+import com.khazoda.core.config.KhazConfigSync;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,6 +1,6 @@
 package com.khazoda.plushables.datagen.provider;
 
-import com.khazoda.core.KhazReg.BlockEntry;
+import com.khazoda.core.reg.KhazReg.BlockEntry;
 import com.khazoda.plushables.block.BasePlushable;
 import com.khazoda.plushables.item.PlushableBlockItem;
 import com.khazoda.plushables.registry.MainRegistry;

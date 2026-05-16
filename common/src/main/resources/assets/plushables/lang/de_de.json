@@ -27,9 +27,11 @@
   "block.plushables.plushable_blahaj": "Plüsch-§9Blåhaj",
   "block.plushables.plushable_cooper": "Plüsch-§8Cooper",
   "command.plushables.root": "Du verwendest Plushables 2.0",
-  "tooltip.plushables.holdctrl": "Halte STRG für Sage",
+  "tooltip.plushables.lore_prompt": "%s für Info",
   "tooltip.plushables.artist": "Künstler/in",
   "tooltip.plushables.created": "Erstellt",
   "item.plushables.heart_of_gold": "§6Herz aus Gold",
-  "subtitles.plushables.block.plushable.interact": "Plüschi gedrückt"
+  "subtitles.plushables.block.plushable.interact": "Plüschi gedrückt",
+  "key.category.plushables.main": "Plushables",
+  "key.plushables.show_lore": "Tooltip vergrößern"
 }

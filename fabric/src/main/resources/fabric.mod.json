@@ -1,41 +1,41 @@
 {
-    "schemaVersion": 1,
-    "id": "${mod_id}",
-    "version": "${version}",
-    "name": "${mod_name}",
-    "description": "${description}",
-    "authors": [
-        "${mod_author}"
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${description}",
+  "authors": [
+    "${mod_author}"
+  ],
+  "contributors": [],
+  "contact": {
+    "homepage": "${homepage_url}",
+    "sources": "${sources_url}",
+    "issues": "${issues_url}"
+  },
+  "license": "${license}",
+  "icon": "${mod_icon}",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.khazoda.plushables.PlushablesFabric"
     ],
-    "contributors": [],
-    "contact": {
-        "homepage": "${homepage_url}",
-        "sources": "${sources_url}",
-        "issues": "${issues_url}"
-    },
-    "license": "${license}",
-    "icon": "${mod_icon}",
-    "environment": "*",
-    "entrypoints": {
-        "main": [
-            "com.khazoda.plushables.PlushablesFabric"
-        ],
-        "client": [
-            "com.khazoda.plushables.platform.FabricConfigSyncClient"
-        ],
-        "fabric-datagen": [
-            "com.khazoda.plushables.datagen.PlushablesDataGenerator"
-        ]
-    },
-    "mixins": [
-        "${mod_id}.mixins.json",
-        "${mod_id}.fabric.mixins.json"
+    "client": [
+      "com.khazoda.plushables.platform.PlushablesFabricClient"
     ],
-    "depends": {
-        "fabricloader": ">=${fabric_loader_version}",
-        "fabric-api": "*",
-        "minecraft": "~${minecraft_version}",
-        "java": ">=${java_version}",
-        "khazodacore": ">=${khazodacore_version}"
-    }
+    "fabric-datagen": [
+      "com.khazoda.plushables.datagen.PlushablesDataGenerator"
+    ]
+  },
+  "mixins": [
+    "${mod_id}.mixins.json",
+    "${mod_id}.fabric.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=${java_version}",
+    "khazodacore": ">=${khazodacore_version}"
+  }
 }

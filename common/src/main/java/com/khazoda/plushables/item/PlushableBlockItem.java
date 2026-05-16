@@ -1,5 +1,6 @@
 package com.khazoda.plushables.item;
 
+import com.khazoda.plushables.PlushablesKeybinds;
 import com.khazoda.plushables.block.BasePlushable;
 import com.khazoda.plushables.platform.Services;
 import net.minecraft.ChatFormatting;
@@ -40,8 +41,8 @@ public class PlushableBlockItem extends BlockItem {
 
     if (!Services.PLATFORM.isClientSide()) return;
     if (!(getBlock() instanceof BasePlushable basePlushable)) return;
-    if (!Minecraft.getInstance().hasControlDown()) {
-      tooltipAdder.accept(Component.translatable("tooltip.plushables.holdctrl").withStyle(ChatFormatting.GRAY));
+    if (!PlushablesKeybinds.SHOW_LORE.isBoundInputHeldInUi()) {
+      addLorePrompt(tooltipAdder);
       return;
     }
 
@@ -55,6 +56,14 @@ public class PlushableBlockItem extends BlockItem {
       tooltipAdder.accept(CommonComponents.EMPTY);
       addTrivia(tooltipAdder, basePlushable.getTooltipData().trivia());
     }
+  }
+
+  private void addLorePrompt(Consumer<Component> tooltipAdder) {
+    if (!PlushablesKeybinds.SHOW_LORE.hasBoundInput()) return;
+    tooltipAdder.accept(Component.translatable(
+        "tooltip.plushables.lore_prompt",
+        PlushablesKeybinds.SHOW_LORE.boundInputLabel().copy().withStyle(ChatFormatting.GRAY)
+    ).withStyle(ChatFormatting.DARK_GRAY));
   }
 
   private void addTrivia(Consumer<Component> tooltipAdder, String trivia) {

@@ -49,14 +49,14 @@
   "block.plushables.plushable_creaky": "Plushable §dCreaky",
   "block.plushables.plushable_kweebec": "Plushable §2Kweebec",
   "block.plushables.plushable_stoneling": "Plushable §8Stoneling",
-
   "command.plushables.root": "You are using Plushables 2.0",
-  "tooltip.plushables.holdctrl": "Hold CTRL For Lore",
+  "tooltip.plushables.lore_prompt": "%s for Lore",
   "tooltip.plushables.artist": "Artist",
   "tooltip.plushables.created": "Created",
   "item.plushables.heart_of_gold": "§6Heart of Gold",
   "subtitles.plushables.block.plushable.interact": "Plushable interacted",
-
+  "key.category.plushables.main": "Plushables",
+  "key.plushables.show_lore": "Expand Tooltip",
   "advancements.plushables.root.title": "§cP§6l§eu§as§bh§9a§5b§cl§6e§es§r",
   "advancements.plushables.root.description": "Find an ingredient for a Heart of Gold.",
   "advancements.plushables.heart_of_gold.title": "Heart of Gold",

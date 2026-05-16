@@ -1,9 +1,9 @@
 package com.khazoda.plushables.registry;
 
 
-import com.khazoda.core.KhazReg;
-import com.khazoda.core.KhazReg.BlockEntry;
-import com.khazoda.core.KhazReg.Entry;
+import com.khazoda.core.reg.KhazReg;
+import com.khazoda.core.reg.KhazReg.BlockEntry;
+import com.khazoda.core.reg.KhazReg.Entry;
 import com.khazoda.plushables.Constants;
 import com.khazoda.plushables.block.BasePlushable;
 import com.khazoda.plushables.block.plushable.*;
