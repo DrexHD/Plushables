@@ -38,7 +38,7 @@
       "translate": "advancements.plushables.root.description"
     },
     "icon": {
-      "id": "plushables:plushable_penguin"
+      "id": "plushables:plushable_froglin"
     },
     "show_toast": false,
     "title": {
@@ -47,9 +47,7 @@
   },
   "requirements": [
     [
-      "has_gold_nugget",
-      "has_flowers",
-      "has_honey_bottle"
+      "has_gold_nugget", "has_flowers", "has_honey_bottle"
     ]
   ],
   "rewards": {

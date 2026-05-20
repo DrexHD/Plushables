@@ -1,0 +1,38 @@
+{
+  "target": [
+    "#plushables:plushable_hats"
+  ],
+  "render": [
+    {
+      "type": "if_slot",
+      "slot": "head/hat",
+      "then": [
+        {
+          "type": "item",
+          "model_part": "head",
+          "display_context": "head",
+          "transformation": {
+            "translation": [
+              0, 0, 0
+            ],
+            "left_rotation": {
+              "axis": [
+                0, 1, 0
+              ],
+              "angle": 3.141
+            },
+            "scale": [
+              0.625, 0.625, 0.625
+            ],
+            "right_rotation": {
+              "axis": [
+                0, 1, 0
+              ],
+              "angle": 0
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
