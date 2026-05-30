@@ -7,7 +7,6 @@ import com.khazoda.plushables.registry.MainRegistry;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -47,7 +46,7 @@ public class PlushableKweebecBlock extends BasePlushable {
   }
 
   @Override
-  protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+  protected MapCodec<PlushableKweebecBlock> codec() {
     return CODEC;
   }
 }

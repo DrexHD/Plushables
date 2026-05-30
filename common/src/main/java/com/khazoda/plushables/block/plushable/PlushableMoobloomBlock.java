@@ -6,7 +6,6 @@ import com.khazoda.plushables.block.tooltip.TooltipDataBuilder;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.animal.cow.CowSoundVariants;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -39,7 +38,7 @@ public class PlushableMoobloomBlock extends BasePlushable {
   }
 
   @Override
-  protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+  protected MapCodec<PlushableMoobloomBlock> codec() {
     return CODEC;
   }
 }

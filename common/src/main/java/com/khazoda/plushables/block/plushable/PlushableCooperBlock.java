@@ -6,7 +6,6 @@ import com.khazoda.plushables.block.tooltip.TooltipDataBuilder;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.animal.wolf.WolfSoundVariants;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -33,7 +32,7 @@ public class PlushableCooperBlock extends BasePlushable {
   }
 
   @Override
-  protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+  protected MapCodec<PlushableCooperBlock> codec() {
     return CODEC;
   }
 }
