@@ -47,7 +47,9 @@
   },
   "requirements": [
     [
-      "has_gold_nugget", "has_flowers", "has_honey_bottle"
+      "has_gold_nugget",
+      "has_flowers",
+      "has_honey_bottle"
     ]
   ],
   "rewards": {

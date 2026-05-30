@@ -12,7 +12,9 @@ public class PlushablesDataGenerator implements DataGeneratorEntrypoint {
   public void onInitializeDataGenerator(FabricDataGenerator generator) {
     var pack = generator.createPack();
     pack.addProvider(PlushablesAdvancementProvider::new);
+    pack.addProvider(PlushablesBlockStateProvider::new);
     pack.addProvider(PlushablesBlockLootTableProvider::new);
+    pack.addProvider(PlushablesBlockTagProvider::new);
     pack.addProvider(PlushablesItemTagProvider::new);
     pack.addProvider(PlushablesRecipeProvider::new);
     pack.addProvider(PlushablesVillagerTradeProvider::new);

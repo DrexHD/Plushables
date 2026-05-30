@@ -10,6 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -21,12 +22,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -36,15 +40,14 @@ import org.jetbrains.annotations.Nullable;
  * Base class for all plushable blocks in the mod.
  * Implements core functionality for directional placement, waterlogging, and
  * block shapes.
- * Extends HorizontalDirectionalBlock for cardinal direction placement and
- * implements SimpleWaterloggedBlock for waterlogging support.
  */
-public abstract class BasePlushable extends HorizontalDirectionalBlock implements SimpleWaterloggedBlock {
+public abstract class BasePlushable extends Block implements SimpleWaterloggedBlock {
   public static final Properties defaultSettings = Properties.of().sound(SoundType.WOOL).strength(0.1f).noOcclusion().pushReaction(PushReaction.DESTROY);
   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+  public static final EnumProperty<Direction> ATTACHMENT = EnumProperty.create("attachment", Direction.class);
+  public static final IntegerProperty ROTATION = IntegerProperty.create("rotation", 0, 3);
   public static final BooleanProperty ON_COOLDOWN = BooleanProperty.create("on_cooldown");
-  final VoxelShape blockShape = useShape(); // Empty 12x12 voxel box
-  final VoxelShape[] blockShapes = VoxelShapeHelper.calculateBlockShapes(blockShape); // Cache all shape directions
+  final VoxelShape[] blockShapes = VoxelShapeHelper.calculateBlockShapes(useShape());
 
   protected final InteractionEffectData effectData;
   protected final TooltipData tooltipData;
@@ -65,7 +68,7 @@ public abstract class BasePlushable extends HorizontalDirectionalBlock implement
     super(settings.lightLevel((blockState) -> effectData.lightLevel()));
     this.effectData = effectData;
     this.tooltipData = tooltipData;
-    registerDefaultState(this.stateDefinition.any().setValue(ON_COOLDOWN, false).setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH).setValue(WATERLOGGED, false));
+    registerDefaultState(this.stateDefinition.any().setValue(ON_COOLDOWN, false).setValue(ATTACHMENT, Direction.UP).setValue(ROTATION, 0).setValue(WATERLOGGED, false));
   }
 
   /**
@@ -133,8 +136,7 @@ public abstract class BasePlushable extends HorizontalDirectionalBlock implement
    */
   @Override
   protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-    Direction direction = state.getValue(FACING);
-    return VoxelShapeHelper.getSidedOutlineShape(direction, blockShape, blockShapes);
+    return VoxelShapeHelper.getSidedOutlineShape(state.getValue(ATTACHMENT), state.getValue(ROTATION), blockShapes);
   }
 
   @Override
@@ -142,24 +144,63 @@ public abstract class BasePlushable extends HorizontalDirectionalBlock implement
     return RenderShape.MODEL;
   }
 
+  /* ==========[ Bounciness ]========== */
+  @Override
+  public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, double fallDistance) {
+    super.fallOn(level, state, pos, entity, fallDistance * 0.5F);
+  }
+
+  @Override
+  public void updateEntityMovementAfterFallOn(BlockGetter level, Entity entity) {
+    if (entity.isSuppressingBounce()) {
+      super.updateEntityMovementAfterFallOn(level, entity);
+    } else {
+      this.bounceUp(entity);
+    }
+  }
+
+  private void bounceUp(Entity entity) {
+    Vec3 movement = entity.getDeltaMovement();
+    if (movement.y < 0.0D) {
+      double multiplier = entity instanceof LivingEntity ? 1.0D : 0.8D;
+      entity.setDeltaMovement(movement.x, -movement.y * 0.33D * multiplier, movement.z);
+    }
+  }
+
   /* ==========[ BlockState ]========== */
 
   /**
-   * Adds FACING and WATERLOGGED properties to the block's state definition.
+   * Adds attachment, rotation and waterlogged properties to the block's state definition.
    */
   @Override
   protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-    builder.add(ON_COOLDOWN, FACING, WATERLOGGED);
+    builder.add(ON_COOLDOWN, ATTACHMENT, ROTATION, WATERLOGGED);
   }
 
   /**
    * Determines the initial state of the block when placed.
-   * Sets facing direction based on player placement and checks for waterlogging.
+   * Uses the clicked face and quadrant to orient the plushable, then checks for waterlogging.
    */
   @Nullable
   @Override
   public BlockState getStateForPlacement(BlockPlaceContext context) {
-    return this.defaultBlockState().setValue(ON_COOLDOWN, false).setValue(BlockStateProperties.HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite()).setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).is(Fluids.WATER));
+    Direction attachment = context.getClickedFace();
+    Direction front = getPlacementFront(context, attachment);
+    int rotation = VoxelShapeHelper.rotationFromFront(attachment, front);
+    boolean waterlogged = context.getLevel().getFluidState(context.getClickedPos()).is(Fluids.WATER);
+
+    return this.defaultBlockState().setValue(ON_COOLDOWN, false).setValue(ATTACHMENT, attachment).setValue(ROTATION, rotation).setValue(WATERLOGGED, waterlogged);
+  }
+
+  private Direction getPlacementFront(BlockPlaceContext context, Direction attachment) {
+    Vec3 center = Vec3.atCenterOf(context.getClickedPos());
+    Vec3 offset = context.getClickLocation().subtract(center);
+    Direction.Axis attachmentAxis = attachment.getAxis();
+    double x = attachmentAxis == Direction.Axis.X ? 0 : offset.x;
+    double y = attachmentAxis == Direction.Axis.Y ? 0 : offset.y;
+    double z = attachmentAxis == Direction.Axis.Z ? 0 : offset.z;
+    boolean hasNoClearFront = x * x + y * y + z * z < 1.0E-6;
+    return hasNoClearFront ? VoxelShapeHelper.frontFromRotation(attachment, 0) : Direction.getApproximateNearest(x, y, z);
   }
 
   /**
@@ -186,12 +227,16 @@ public abstract class BasePlushable extends HorizontalDirectionalBlock implement
    */
   @Override
   protected BlockState rotate(BlockState state, Rotation rot) {
-    return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
+    Direction attachment = rot.rotate(state.getValue(ATTACHMENT));
+    Direction front = rot.rotate(VoxelShapeHelper.frontFromRotation(state.getValue(ATTACHMENT), state.getValue(ROTATION)));
+    return state.setValue(ATTACHMENT, attachment).setValue(ROTATION, VoxelShapeHelper.rotationFromFront(attachment, front));
   }
 
   @Override
   protected BlockState mirror(BlockState state, Mirror mirror) {
-    return state.rotate(mirror.getRotation(state.getValue(FACING)));
+    Direction attachment = mirror.mirror(state.getValue(ATTACHMENT));
+    Direction front = mirror.mirror(VoxelShapeHelper.frontFromRotation(state.getValue(ATTACHMENT), state.getValue(ROTATION)));
+    return state.setValue(ATTACHMENT, attachment).setValue(ROTATION, VoxelShapeHelper.rotationFromFront(attachment, front));
   }
 
   @Override

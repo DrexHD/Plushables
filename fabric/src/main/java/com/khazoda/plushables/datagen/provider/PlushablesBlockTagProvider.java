@@ -13,12 +13,12 @@ import net.minecraft.resources.Identifier;
 
 import java.util.concurrent.CompletableFuture;
 
-public class PlushablesItemTagProvider implements DataProvider {
-  public static final Identifier ALL_PLUSHABLE_ITEMS = Constants.ID("all_plushables");
+public class PlushablesBlockTagProvider implements DataProvider {
+  public static final Identifier ALL_PLUSHABLE_BLOCKS = Constants.ID("all_plushables");
   private final PackOutput.PathProvider pathProvider;
 
-  public PlushablesItemTagProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
-    this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "tags/item");
+  public PlushablesBlockTagProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+    this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "tags/block");
   }
 
   @Override
@@ -27,17 +27,16 @@ public class PlushablesItemTagProvider implements DataProvider {
     tag.addProperty("replace", false);
 
     JsonArray values = new JsonArray();
-
     for (var plushable : MainRegistry.ALL_PLUSHABLES) {
-      values.add(plushable.item().id().toString());
+      values.add(plushable.block().id().toString());
     }
 
     tag.add("values", values);
-    return DataProvider.saveStable(output, tag, this.pathProvider.json(ALL_PLUSHABLE_ITEMS));
+    return DataProvider.saveStable(output, tag, this.pathProvider.json(ALL_PLUSHABLE_BLOCKS));
   }
 
   @Override
   public String getName() {
-    return "Plushables Item Tags";
+    return "Plushables Block Tags";
   }
 }

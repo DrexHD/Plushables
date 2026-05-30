@@ -1,6 +1,6 @@
 {
   "target": [
-    "#plushables:plushable_hats"
+    "#plushables:all_plushables"
   ],
   "render": [
     {
