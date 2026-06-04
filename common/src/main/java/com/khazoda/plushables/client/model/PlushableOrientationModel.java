@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,22 +32,20 @@ public final class PlushableOrientationModel implements BlockStateModel {
     return state.getBlock() instanceof BasePlushable;
   }
 
-  public static Map<BlockState, BlockStateModel> wrapPlushableModels(Map<BlockState, BlockStateModel> models) {
+  public static void wrapPlushableModels(Map<BlockState, BlockStateModel> models, Collection<? extends Block> plushables) {
     Map<Block, Map<Integer, BlockStateModel>> cache = new HashMap<>();
-    Map<BlockState, BlockStateModel> wrappedModels = null;
 
-    for (Map.Entry<BlockState, BlockStateModel> entry : models.entrySet()) {
-      BlockStateModel wrappedModel = wrapPlushableModel(entry.getKey(), entry.getValue(), cache);
-      if (wrappedModel == entry.getValue()) {
-        continue;
+    for (Block plushable : plushables) {
+      for (BlockState state : plushable.getStateDefinition().getPossibleStates()) {
+        BlockStateModel model = models.get(state);
+        if (model == null) continue;
+
+        BlockStateModel wrappedModel = wrapPlushableModel(state, model, cache);
+        if (wrappedModel != model) {
+          models.put(state, wrappedModel);
+        }
       }
-      if (wrappedModels == null) {
-        wrappedModels = new HashMap<>(models);
-      }
-      wrappedModels.put(entry.getKey(), wrappedModel);
     }
-
-    return wrappedModels == null ? models : wrappedModels;
   }
 
   public static BlockStateModel wrapPlushableModel(BlockState state, BlockStateModel model, Map<Block, Map<Integer, BlockStateModel>> cache) {
@@ -96,13 +95,11 @@ public final class PlushableOrientationModel implements BlockStateModel {
     private final List<BakedQuad>[] quads;
     private final Material.Baked particleMaterial;
     private final int materialFlags;
-    private boolean useAmbientOcclusion;
 
     @SuppressWarnings("unchecked")
     private OrientedPart(BlockStateModelPart part, VoxelShapeHelper.Orientation orientation) {
       this.orientation = orientation;
       this.quads = new List[SIDE_COUNT];
-      this.useAmbientOcclusion = part.useAmbientOcclusion();
       this.particleMaterial = part.particleMaterial();
       this.materialFlags = part.materialFlags();
 
@@ -142,15 +139,12 @@ public final class PlushableOrientationModel implements BlockStateModel {
 
     private Vector3f transform(org.joml.Vector3fc position) {
       var transformed = orientation.transform(position.x(), position.y(), position.z());
-      if (transformed.x < 0 || transformed.x > 1 || transformed.y < 0 || transformed.y > 1 || transformed.z < 0 || transformed.z > 1) {
-        useAmbientOcclusion = false;
-      }
       return new Vector3f((float) transformed.x, (float) transformed.y, (float) transformed.z);
     }
 
     @Override
     public boolean useAmbientOcclusion() {
-      return useAmbientOcclusion;
+      return false;
     }
 
     @Override
