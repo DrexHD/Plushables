@@ -1,5 +1,6 @@
 package com.khazoda.plushables.block;
 
+import com.khazoda.plushables.PlushablesConfig;
 import com.khazoda.plushables.block.interaction.InteractionEffectData;
 import com.khazoda.plushables.block.tooltip.TooltipData;
 import com.khazoda.plushables.block.util.VoxelShapeHelper;
@@ -21,10 +22,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -89,6 +87,7 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
    */
   protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
     if (player.isSecondaryUseActive()) {
+      if (!canInteractWithStoredItems(player)) return InteractionResult.PASS;
       if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS_SERVER;
       return extractItemFromPlushable(serverLevel, state, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
     }
@@ -100,6 +99,7 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
 
   @Override
   protected InteractionResult useItemOn(ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    if (!canInteractWithStoredItems(player)) return InteractionResult.TRY_WITH_EMPTY_HAND;
     if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.TRY_WITH_EMPTY_HAND;
     return storeItemInPlushable(serverLevel, state, pos, player, heldStack) ? InteractionResult.SUCCESS : InteractionResult.TRY_WITH_EMPTY_HAND;
   }
@@ -200,6 +200,7 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
   }
 
   private static boolean tryExplodeStoredTnt(ServerLevel serverLevel, BlockPos pos) {
+    if (!PlushablesConfig.storedTntExplosionsEnabled()) return false;
     if (!serverLevel.hasNeighborSignal(pos)) return false;
     if (!(serverLevel.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity)) return false;
     if (!blockEntity.getTheItem().is(Blocks.TNT.asItem())) return false;
@@ -209,6 +210,10 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
     serverLevel.sendParticles(ParticleTypes.SNOWFLAKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 90, 1.0, 1.0, 1.0, 0.08);
     serverLevel.explode(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 3.0F, Level.ExplosionInteraction.TNT);
     return true;
+  }
+
+  private static boolean canInteractWithStoredItems(Player player) {
+    return PlushablesConfig.storageSystemEnabled() && player.gameMode() != GameType.ADVENTURE;
   }
 
   private static boolean canStoreInPlushable(ItemStack stack) {

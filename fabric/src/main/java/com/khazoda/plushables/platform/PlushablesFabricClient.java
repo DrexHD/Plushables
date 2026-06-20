@@ -3,7 +3,7 @@ package com.khazoda.plushables.platform;
 import com.khazoda.core.config.KhazConfigSyncFabric;
 import com.khazoda.core.keybind.KhazKeybindFabric;
 import com.khazoda.plushables.Constants;
-import com.khazoda.plushables.PlushablesCommon;
+import com.khazoda.plushables.PlushablesConfig;
 import com.khazoda.plushables.PlushablesKeybinds;
 import com.khazoda.plushables.client.model.PlushableOrientationModel;
 import net.fabricmc.api.ClientModInitializer;
@@ -19,11 +19,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class PlushablesFabricClient implements ClientModInitializer {
   private static void registerServerConfigReceiver() {
-    ClientPlayNetworking.registerGlobalReceiver(Constants.CONFIG_SYNC.type(), (payload, context) -> PlushablesCommon.CONFIG.applyServerSyncedValues(payload.serverValues()));
+    ClientPlayNetworking.registerGlobalReceiver(Constants.CONFIG_SYNC.type(), (payload, context) -> PlushablesConfig.CONFIG.applyServerSyncedValues(payload.serverValues()));
   }
 
   private static void registerDisconnectReloadListener() {
-    ClientPlayConnectionEvents.DISCONNECT.register((listener, client) -> PlushablesCommon.CONFIG.clearServerSyncedValuesAndReload());
+    ClientPlayConnectionEvents.DISCONNECT.register((listener, client) -> PlushablesConfig.CONFIG.clearServerSyncedValuesAndReload());
   }
 
   private static void registerPlushableModelOrientation() {
