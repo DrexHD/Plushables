@@ -1,6 +1,9 @@
 package com.khazoda.plushables.platform.services;
 
 import com.khazoda.core.config.KhazConfig;
+import com.khazoda.plushables.block.BasePlushableBlockEntity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.nio.file.Path;
 
@@ -36,6 +39,8 @@ public interface IPlatformHelper {
   Path getConfigDirectory();
 
   void registerServerConfigSync(KhazConfig config);
+
+  BlockEntityType<BasePlushableBlockEntity> createPlushableBlockEntityType(Block... validBlocks);
 
   /**
    * Gets the name of the environment type as a string.

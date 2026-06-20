@@ -3,21 +3,30 @@ package com.khazoda.plushables.block;
 import com.khazoda.plushables.block.interaction.InteractionEffectData;
 import com.khazoda.plushables.block.tooltip.TooltipData;
 import com.khazoda.plushables.block.util.VoxelShapeHelper;
+import com.khazoda.plushables.item.PlushableBlockItem;
+import com.khazoda.plushables.registry.MainRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -25,10 +34,12 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -41,7 +52,7 @@ import org.jetbrains.annotations.Nullable;
  * Implements core functionality for directional placement, waterlogging, and
  * block shapes.
  */
-public abstract class BasePlushable extends Block implements SimpleWaterloggedBlock {
+public abstract class BasePlushable extends Block implements SimpleWaterloggedBlock, EntityBlock {
   public static final Properties defaultSettings = Properties.of().sound(SoundType.WOOL).strength(0.1f).noOcclusion().pushReaction(PushReaction.DESTROY);
   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
   public static final EnumProperty<Direction> ATTACHMENT = EnumProperty.create("attachment", Direction.class);
@@ -73,33 +84,87 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
 
   /**
    * {@link #useWithoutItem}, {@link #playInteractionEffects} and {@link #startCooldown}
-   * all work together to play interaction sounds and effects at a set cooldown.
+   * all work together to play interaction sounds and effects at a set cooldown, and allow an item
+   * to be deposited and extracted.
    */
   protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-    return state.getValue(ON_COOLDOWN) ? InteractionResult.CONSUME : this.playInteractionEffects(level, state, hitResult, player) ? InteractionResult.SUCCESS_SERVER : InteractionResult.PASS;
-  }
-
-  public boolean playInteractionEffects(Level level, BlockState state, BlockHitResult hitResult, Entity entity) {
-    BlockPos blockPos = hitResult.getBlockPos();
-
-    /* Play Sound */
-    level.playSound(null, blockPos, effectData.soundEvent(), SoundSource.BLOCKS, effectData.soundVolume(), effectData.soundPitch());
-
-    /* Spawn Particles */
-    if (level.isClientSide() && effectData.particleEffect() != null) {
-      RandomSource random = level.getRandom();
-      for (int i = 0; i < effectData.particleCount(); i++) {
-        double spread = effectData.particleSpread();
-        double x = blockPos.getX() + 0.5 + (random.nextDouble() - 0.5) * spread;
-        double y = blockPos.getY() + 0.75 + effectData.particleYOffset() + (random.nextDouble() - 0.5) * spread;
-        double z = blockPos.getZ() + 0.5 + (random.nextDouble() - 0.5) * spread;
-        level.addParticle(effectData.particleEffect(), x, y, z, 0, 0, 0);
-      }
+    if (player.isSecondaryUseActive()) {
+      if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS_SERVER;
+      return extractItemFromPlushable(serverLevel, state, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
     }
 
-    this.startCooldown(state, level, blockPos);
-    level.gameEvent(entity, GameEvent.BLOCK_ACTIVATE, blockPos);
+    if (state.getValue(ON_COOLDOWN)) return InteractionResult.CONSUME;
+    if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
+    return this.playInteractionEffects(serverLevel, state, pos, player) ? InteractionResult.CONSUME : InteractionResult.PASS;
+  }
+
+  @Override
+  protected InteractionResult useItemOn(ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.TRY_WITH_EMPTY_HAND;
+    return storeItemInPlushable(serverLevel, state, pos, player, heldStack) ? InteractionResult.SUCCESS : InteractionResult.TRY_WITH_EMPTY_HAND;
+  }
+
+  private static boolean storeItemInPlushable(ServerLevel serverLevel, BlockState state, BlockPos pos, Player player, ItemStack heldStack) {
+    if (!(serverLevel.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity)) return false;
+    if (!blockEntity.getTheItem().isEmpty() || heldStack.isEmpty()) return false;
+    if (!canStoreInPlushable(heldStack)) return false;
+
+    ItemStack item = player.isCreative() ? heldStack.copyWithCount(1) : heldStack.split(1);
+    blockEntity.setTheItem(item);
+    if (tryExplodeStoredTnt(serverLevel, pos)) return true;
+
+    playStorageEffects(serverLevel, state, pos, MainRegistry.INSERT_ITEM.get(), 1.0F, 1.0F);
+    serverLevel.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
     return true;
+  }
+
+  private static boolean extractItemFromPlushable(ServerLevel serverLevel, BlockState state, BlockPos pos, Player player) {
+    if (!(serverLevel.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity)) return false;
+
+    ItemStack item = blockEntity.removeTheItem();
+    if (item.isEmpty()) return false;
+
+    if (!player.addItem(item)) player.drop(item, false);
+    player.swing(InteractionHand.MAIN_HAND, true);
+    playStorageEffects(serverLevel, state, pos, MainRegistry.EXTRACT_ITEM.get(), 0.6F, 1.0F);
+    serverLevel.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+    return true;
+  }
+
+  private static void playStorageEffects(ServerLevel serverLevel, BlockState state, BlockPos pos, SoundEvent sound, float volume, float pitch) {
+    serverLevel.playSound(null, pos, sound, SoundSource.BLOCKS, volume, pitch);
+    sendFluffFromServer(serverLevel, pos, state.getValue(ATTACHMENT));
+  }
+
+  public boolean playInteractionEffects(ServerLevel serverLevel, BlockState state, BlockPos blockPos, Entity entity) {
+    boolean hasStoredItem = hasStoredItem(serverLevel, blockPos);
+
+    serverLevel.playSound(null, blockPos, effectData.soundEvent(), SoundSource.BLOCKS, effectData.soundVolume(), hasStoredItem ? effectData.soundPitch() * 0.75F : effectData.soundPitch());
+    if (hasStoredItem) sendFluffFromServer(serverLevel, blockPos, state.getValue(ATTACHMENT));
+    if (effectData.particleEffect() != null) {
+      serverLevel.sendParticles(effectData.particleEffect(), blockPos.getX() + 0.5, blockPos.getY() + 0.75 + effectData.particleYOffset(), blockPos.getZ() + 0.5, effectData.particleCount(), effectData.particleSpread() * 0.5, effectData.particleSpread() * 0.5, effectData.particleSpread() * 0.5, 0);
+    }
+
+    this.startCooldown(state, serverLevel, blockPos);
+    serverLevel.gameEvent(entity, GameEvent.BLOCK_ACTIVATE, blockPos);
+    return true;
+  }
+
+  private static boolean hasStoredItem(Level level, BlockPos pos) {
+    return level.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity && !blockEntity.getTheItem().isEmpty();
+  }
+
+  private static void sendFluffFromServer(ServerLevel level, BlockPos pos, Direction attachment) {
+    Direction.Axis axis = attachment.getAxis();
+    double plane = attachment.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 0.12 : 0.88;
+    double x = pos.getX() + (axis == Direction.Axis.X ? plane : 0.5);
+    double y = pos.getY() + (axis == Direction.Axis.Y ? plane : 0.5);
+    double z = pos.getZ() + (axis == Direction.Axis.Z ? plane : 0.5);
+    double xSpread = axis == Direction.Axis.X ? 0.03 : 0.25;
+    double ySpread = axis == Direction.Axis.Y ? 0.03 : 0.25;
+    double zSpread = axis == Direction.Axis.Z ? 0.03 : 0.25;
+
+    level.sendParticles(ParticleTypes.SNOWFLAKE, x, y, z, 5, xSpread, ySpread, zSpread, 0.01);
   }
 
   public void startCooldown(BlockState state, Level level, BlockPos pos) {
@@ -116,6 +181,53 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
 
   public TooltipData getTooltipData() {
     return tooltipData;
+  }
+
+  @Override
+  protected boolean hasAnalogOutputSignal(BlockState state) {
+    return true;
+  }
+
+  @Override
+  protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+    return hasStoredItem(level, pos) ? 15 : 0;
+  }
+
+  @Override
+  protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, Orientation orientation, boolean movedByPiston) {
+    if (level instanceof ServerLevel serverLevel && tryExplodeStoredTnt(serverLevel, pos)) return;
+    super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
+  }
+
+  private static boolean tryExplodeStoredTnt(ServerLevel serverLevel, BlockPos pos) {
+    if (!serverLevel.hasNeighborSignal(pos)) return false;
+    if (!(serverLevel.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity)) return false;
+    if (!blockEntity.getTheItem().is(Blocks.TNT.asItem())) return false;
+    if (!serverLevel.getGameRules().get(GameRules.TNT_EXPLODES)) return false;
+
+    serverLevel.removeBlock(pos, false);
+    serverLevel.sendParticles(ParticleTypes.SNOWFLAKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 90, 1.0, 1.0, 1.0, 0.08);
+    serverLevel.explode(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 3.0F, Level.ExplosionInteraction.TNT);
+    return true;
+  }
+
+  private static boolean canStoreInPlushable(ItemStack stack) {
+    if (stack.getItem() instanceof PlushableBlockItem) {
+      return !isTotallyStuffed(stack) && StoredItemComponentAllowlist.allows(stack, DataComponents.CONTAINER);
+    }
+    return StoredItemComponentAllowlist.allows(stack);
+  }
+
+  public static boolean isTotallyStuffed(ItemStack stack) {
+    for (int depth = 0; depth < 8; depth++) {
+      if (!(stack.getItem() instanceof PlushableBlockItem)) return false;
+      stack = storedPlushableItem(stack);
+    }
+    return true;
+  }
+
+  public static ItemStack storedPlushableItem(ItemStack stack) {
+    return stack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyOne();
   }
 
   /**
@@ -142,6 +254,11 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
   @Override
   protected RenderShape getRenderShape(BlockState state) {
     return RenderShape.MODEL;
+  }
+
+  @Override
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new BasePlushableBlockEntity(pos, state);
   }
 
   /* ==========[ Bounciness ]========== */

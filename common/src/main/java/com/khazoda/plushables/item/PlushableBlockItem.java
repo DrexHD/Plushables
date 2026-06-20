@@ -28,7 +28,9 @@ public class PlushableBlockItem extends BlockItem {
   }
 
   private static Properties defaultProperties(Properties properties) {
-    return properties.stacksTo(16).component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.HEAD).build());
+    return properties.stacksTo(16)
+        .component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.HEAD).build())
+        .component(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay.DEFAULT.withHidden(DataComponents.CONTAINER, true)); //suppresses vanilla's container tooltip showing exact contents
   }
 
   /**
@@ -43,18 +45,23 @@ public class PlushableBlockItem extends BlockItem {
     if (!(getBlock() instanceof BasePlushable basePlushable)) return;
     if (!PlushablesKeybinds.SHOW_LORE.isBoundInputHeldInUi()) {
       addLorePrompt(tooltipAdder);
-      return;
+    } else {
+      // Add basic info
+      tooltipAdder.accept(Component.literal(basePlushable.getTooltipData().number()).withStyle(ChatFormatting.YELLOW));
+      tooltipAdder.accept(Component.translatable("tooltip.plushables.artist").append(" \u00B7 " + basePlushable.getTooltipData().artist()).withStyle(ChatFormatting.GREEN));
+      tooltipAdder.accept(Component.translatable("tooltip.plushables.created").append(" \u00B7 " + basePlushable.getTooltipData().localizeDate(Minecraft.getInstance().getLanguageManager().getSelected())).withStyle(ChatFormatting.DARK_GREEN));
+
+      // Add trivia if available
+      if (basePlushable.getTooltipData().trivia() != null) {
+        tooltipAdder.accept(CommonComponents.EMPTY);
+        addTrivia(tooltipAdder, basePlushable.getTooltipData().trivia());
+      }
     }
 
-    // Add basic info
-    tooltipAdder.accept(Component.literal(basePlushable.getTooltipData().number()).withStyle(ChatFormatting.YELLOW));
-    tooltipAdder.accept(Component.translatable("tooltip.plushables.artist").append(" \u00B7 " + basePlushable.getTooltipData().artist()).withStyle(ChatFormatting.GREEN));
-    tooltipAdder.accept(Component.translatable("tooltip.plushables.created").append(" \u00B7 " + basePlushable.getTooltipData().localizeDate(Minecraft.getInstance().getLanguageManager().getSelected())).withStyle(ChatFormatting.DARK_GREEN));
-
-    // Add trivia if available
-    if (basePlushable.getTooltipData().trivia() != null) {
-      tooltipAdder.accept(CommonComponents.EMPTY);
-      addTrivia(tooltipAdder, basePlushable.getTooltipData().trivia());
+    if (BasePlushable.isTotallyStuffed(stack)) {
+      tooltipAdder.accept(Component.translatable("tooltip.plushables.totally_stuffed").withStyle(ChatFormatting.DARK_GRAY));
+    } else if (!BasePlushable.storedPlushableItem(stack).isEmpty()) {
+      tooltipAdder.accept(Component.translatable("tooltip.plushables.contains_item").withStyle(ChatFormatting.DARK_GRAY));
     }
   }
 

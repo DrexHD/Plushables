@@ -1,18 +1,22 @@
 package com.khazoda.plushables.registry;
 
-
 import com.khazoda.core.reg.KhazReg;
 import com.khazoda.core.reg.KhazReg.BlockEntry;
 import com.khazoda.core.reg.KhazReg.Entry;
 import com.khazoda.plushables.Constants;
 import com.khazoda.plushables.block.BasePlushable;
+import com.khazoda.plushables.block.BasePlushableBlockEntity;
 import com.khazoda.plushables.block.plushable.*;
 import com.khazoda.plushables.item.PlushableBlockItem;
+import com.khazoda.plushables.platform.Services;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import java.util.ArrayList;
@@ -101,6 +105,15 @@ public final class MainRegistry {
   public static final Entry<SoundEvent> PLUSHABLE_WIZARD = reg.sound("plushable_wizard");
   public static final Entry<SoundEvent> PLUSHABLE_KWEEBEC = reg.sound("plushable_kweebec");
   public static final Entry<SoundEvent> PLUSHABLE_STONELING = reg.sound("plushable_stoneling");
+  public static final Entry<SoundEvent> INSERT_ITEM = reg.sound("insert_item");
+  public static final Entry<SoundEvent> EXTRACT_ITEM = reg.sound("extract_item");
+
+  /**
+   * ==========[ Block Entity Types ]=========
+   */
+  public static final Entry<BlockEntityType<BasePlushableBlockEntity>> PLUSHABLE_BLOCK_ENTITY = reg.register(
+      Registries.BLOCK_ENTITY_TYPE, "plushable", key -> Services.PLATFORM.createPlushableBlockEntityType(allPlushableBlocks())
+  );
 
   /**
    * ==========[ Tabs ]==========
@@ -128,5 +141,9 @@ public final class MainRegistry {
         factory.apply(BasePlushable.defaultSettings.setId(key)), PlushableBlockItem::new).addToTab(TAB);
     ALL_PLUSHABLES_MUTABLE.add(entry);
     return entry;
+  }
+
+  private static Block[] allPlushableBlocks() {
+    return ALL_PLUSHABLES.stream().map(BlockEntry::get).toArray(Block[]::new);
   }
 }

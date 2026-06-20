@@ -1,9 +1,12 @@
 package com.khazoda.plushables.platform;
 
 import com.khazoda.plushables.Constants;
+import com.khazoda.plushables.block.BasePlushableBlockEntity;
 import com.khazoda.plushables.platform.services.IPlatformHelper;
 import com.khazoda.core.config.KhazConfig;
 import com.khazoda.core.config.KhazConfigSyncNeoForge;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLLoader;
@@ -37,6 +40,12 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
   public void registerServerConfigSync(KhazConfig config) {
     KhazConfigSyncNeoForge.registerServerConfigSync(config, Constants.CONFIG_SYNC);
   }
+
+  @Override
+  public BlockEntityType<BasePlushableBlockEntity> createPlushableBlockEntityType(Block... validBlocks) {
+    return new BlockEntityType<>(BasePlushableBlockEntity::new, validBlocks);
+  }
+
   @Override
   public boolean isClientSide() {
     return FMLEnvironment.getDist().isClient();

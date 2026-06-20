@@ -3,11 +3,21 @@
   "id": "${mod_id}",
   "version": "${version}",
   "name": "${mod_name}",
-  "description": "${description}",
+  "description": "<rainbow>${description}",
   "authors": [
     "${mod_author}"
   ],
-  "contributors": [],
+  "contributors": [
+    "BumbleSculpts",
+    "Luke",
+    "ChrysanthCow",
+    "Steam 'n' Rails Team",
+    "Sammy",
+    "hibi",
+    "Joosh",
+    "Omasumi",
+    "wiiv"
+  ],
   "contact": {
     "homepage": "${homepage_url}",
     "sources": "${sources_url}",
@@ -15,6 +25,7 @@
   },
   "license": "${license}",
   "icon": "${mod_icon}",
+  "accessWidener": "${mod_id}.accesswidener",
   "environment": "*",
   "entrypoints": {
     "main": [
