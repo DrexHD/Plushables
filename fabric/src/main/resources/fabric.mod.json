@@ -3,28 +3,20 @@
   "id": "${mod_id}",
   "version": "${version}",
   "name": "${mod_name}",
-  "description": "<rainbow>${description}",
+  "description": "${description}",
+  "icon": "assets/${mod_id}/icon.png",
   "authors": [
     "${mod_author}"
   ],
   "contributors": [
-    "BumbleSculpts",
-    "Luke",
-    "ChrysanthCow",
-    "Steam 'n' Rails Team",
-    "Sammy",
-    "hibi",
-    "Joosh",
-    "Omasumi",
-    "wiiv"
+    "BumbleSculpts", "Luke", "ChrysanthCow", "Steam 'n' Rails Team", "Sammy", "hibi", "Joosh", "Omasumi", "wiiv"
   ],
   "contact": {
-    "homepage": "${homepage_url}",
-    "sources": "${sources_url}",
-    "issues": "${issues_url}"
+    "homepage": "${mod_homepage}",
+    "sources": "${mod_sources}",
+    "issues": "${mod_issues}"
   },
   "license": "${license}",
-  "icon": "${mod_icon}",
   "accessWidener": "${mod_id}.accesswidener",
   "environment": "*",
   "entrypoints": {
@@ -39,8 +31,7 @@
     ]
   },
   "mixins": [
-    "${mod_id}.mixins.json",
-    "${mod_id}.fabric.mixins.json"
+    "${mod_id}.mixins.json", "${mod_id}.fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
@@ -48,5 +39,16 @@
     "minecraft": "~${minecraft_version}",
     "java": ">=${java_version}",
     "khazodacore": ">=${khazodacore_version}"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.com/invite/vEZUkSxwR9"
+      }
+    },
+    "catalogue": {
+      "banner": "assets/${mod_id}/banner.png",
+      "background": "assets/${mod_id}/background.png"
+    }
   }
 }
