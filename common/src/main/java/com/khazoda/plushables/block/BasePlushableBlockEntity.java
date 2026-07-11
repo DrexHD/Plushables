@@ -1,10 +1,12 @@
 package com.khazoda.plushables.block;
 
+import com.khazoda.plushables.PlushablesConfig;
 import com.khazoda.plushables.registry.MainRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -37,6 +39,10 @@ public class BasePlushableBlockEntity extends BlockEntity implements ContainerSi
     if (this.level != null) {
       this.level.updateNeighbourForOutputSignal(this.worldPosition, this.getBlockState().getBlock());
     }
+
+    if (this.level instanceof ServerLevel serverLevel) {
+      BasePlushable.tryExplodeStoredTnt(serverLevel, this.worldPosition);
+    }
   }
 
   @Override
@@ -51,6 +57,24 @@ public class BasePlushableBlockEntity extends BlockEntity implements ContainerSi
   @Override
   public boolean stillValid(Player player) {
     return Container.stillValidBlockEntity(this, player);
+  }
+
+  @Override
+  public int getMaxStackSize() {
+    return 1;
+  }
+
+  @Override
+  public boolean canPlaceItem(int slot, ItemStack itemStack) {
+    return PlushablesConfig.storageSystemEnabled()
+        && slot == 0
+        && this.item.isEmpty()
+        && BasePlushable.canStoreInPlushable(itemStack);
+  }
+
+  @Override
+  public boolean canTakeItem(Container into, int slot, ItemStack itemStack) {
+    return PlushablesConfig.storageSystemEnabled();
   }
 
   @Override

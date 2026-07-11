@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -56,10 +57,9 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
   public static final EnumProperty<Direction> ATTACHMENT = EnumProperty.create("attachment", Direction.class);
   public static final IntegerProperty ROTATION = IntegerProperty.create("rotation", 0, 3);
   public static final BooleanProperty ON_COOLDOWN = BooleanProperty.create("on_cooldown");
-  final VoxelShape[] blockShapes = VoxelShapeHelper.calculateBlockShapes(useShape());
-
   protected final InteractionEffectData effectData;
   protected final TooltipData tooltipData;
+  final VoxelShape[] blockShapes = VoxelShapeHelper.calculateBlockShapes(useShape());
 
   public BasePlushable(Properties settings) {
     this(settings, TooltipData.DEFAULT, InteractionEffectData.DEFAULT);
@@ -78,6 +78,91 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
     this.effectData = effectData;
     this.tooltipData = tooltipData;
     registerDefaultState(this.stateDefinition.any().setValue(ON_COOLDOWN, false).setValue(ATTACHMENT, Direction.UP).setValue(ROTATION, 0).setValue(WATERLOGGED, false));
+  }
+
+  private static boolean storeItemInPlushable(ServerLevel serverLevel, BlockState state, BlockPos pos, Player player, ItemStack heldStack) {
+    if (!(serverLevel.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity)) return false;
+    if (!blockEntity.getTheItem().isEmpty() || heldStack.isEmpty()) return false;
+    if (!canStoreInPlushable(heldStack)) return false;
+
+    ItemStack item = player.isCreative() ? heldStack.copyWithCount(1) : heldStack.split(1);
+    blockEntity.setTheItem(item);
+    if (serverLevel.getBlockEntity(pos) != blockEntity) return true;
+
+    playStorageEffects(serverLevel, state, pos, MainRegistry.INSERT_ITEM.get(), 1.0F, 1.0F);
+    serverLevel.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+    return true;
+  }
+
+  private static boolean extractItemFromPlushable(ServerLevel serverLevel, BlockState state, BlockPos pos, Player player) {
+    if (!(serverLevel.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity)) return false;
+
+    ItemStack item = blockEntity.removeTheItem();
+    if (item.isEmpty()) return false;
+
+    if (!player.addItem(item)) player.drop(item, false);
+    player.swing(InteractionHand.MAIN_HAND, true);
+    playStorageEffects(serverLevel, state, pos, MainRegistry.EXTRACT_ITEM.get(), 0.6F, 1.0F);
+    serverLevel.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+    return true;
+  }
+
+  private static void playStorageEffects(ServerLevel serverLevel, BlockState state, BlockPos pos, SoundEvent sound, float volume, float pitch) {
+    serverLevel.playSound(null, pos, sound, SoundSource.BLOCKS, volume, pitch);
+    sendFluffFromServer(serverLevel, pos, state.getValue(ATTACHMENT));
+  }
+
+  private static boolean hasStoredItem(Level level, BlockPos pos) {
+    return level.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity && !blockEntity.getTheItem().isEmpty();
+  }
+
+  private static void sendFluffFromServer(ServerLevel level, BlockPos pos, Direction attachment) {
+    Direction.Axis axis = attachment.getAxis();
+    double plane = attachment.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 0.12 : 0.88;
+    double x = pos.getX() + (axis == Direction.Axis.X ? plane : 0.5);
+    double y = pos.getY() + (axis == Direction.Axis.Y ? plane : 0.5);
+    double z = pos.getZ() + (axis == Direction.Axis.Z ? plane : 0.5);
+    double xSpread = axis == Direction.Axis.X ? 0.03 : 0.25;
+    double ySpread = axis == Direction.Axis.Y ? 0.03 : 0.25;
+    double zSpread = axis == Direction.Axis.Z ? 0.03 : 0.25;
+
+    level.sendParticles(ParticleTypes.SNOWFLAKE, x, y, z, 5, xSpread, ySpread, zSpread, 0.01);
+  }
+
+  static boolean tryExplodeStoredTnt(ServerLevel serverLevel, BlockPos pos) {
+    if (!PlushablesConfig.storedTntExplosionsEnabled()) return false;
+    if (!serverLevel.hasNeighborSignal(pos)) return false;
+    if (!(serverLevel.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity)) return false;
+    if (!blockEntity.getTheItem().is(Blocks.TNT.asItem())) return false;
+    if (!serverLevel.getGameRules().get(GameRules.TNT_EXPLODES)) return false;
+
+    serverLevel.removeBlock(pos, false);
+    serverLevel.sendParticles(ParticleTypes.SNOWFLAKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 90, 1.0, 1.0, 1.0, 0.08);
+    serverLevel.explode(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 3.0F, Level.ExplosionInteraction.TNT);
+    return true;
+  }
+
+  private static boolean canInteractWithStoredItems(Player player) {
+    return PlushablesConfig.storageSystemEnabled() && player.gameMode() != GameType.ADVENTURE;
+  }
+
+  static boolean canStoreInPlushable(ItemStack stack) {
+    if (stack.getItem() instanceof PlushableBlockItem) {
+      return !isTotallyStuffed(stack) && StoredItemComponentAllowlist.allows(stack, DataComponents.CONTAINER);
+    }
+    return StoredItemComponentAllowlist.allows(stack);
+  }
+
+  public static boolean isTotallyStuffed(ItemStack stack) {
+    for (int depth = 0; depth < 8; depth++) {
+      if (!(stack.getItem() instanceof PlushableBlockItem)) return false;
+      stack = storedPlushableItem(stack);
+    }
+    return true;
+  }
+
+  public static ItemStack storedPlushableItem(ItemStack stack) {
+    return stack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyOne();
   }
 
   /**
@@ -104,38 +189,6 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
     return storeItemInPlushable(serverLevel, state, pos, player, heldStack) ? InteractionResult.SUCCESS : InteractionResult.TRY_WITH_EMPTY_HAND;
   }
 
-  private static boolean storeItemInPlushable(ServerLevel serverLevel, BlockState state, BlockPos pos, Player player, ItemStack heldStack) {
-    if (!(serverLevel.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity)) return false;
-    if (!blockEntity.getTheItem().isEmpty() || heldStack.isEmpty()) return false;
-    if (!canStoreInPlushable(heldStack)) return false;
-
-    ItemStack item = player.isCreative() ? heldStack.copyWithCount(1) : heldStack.split(1);
-    blockEntity.setTheItem(item);
-    if (tryExplodeStoredTnt(serverLevel, pos)) return true;
-
-    playStorageEffects(serverLevel, state, pos, MainRegistry.INSERT_ITEM.get(), 1.0F, 1.0F);
-    serverLevel.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-    return true;
-  }
-
-  private static boolean extractItemFromPlushable(ServerLevel serverLevel, BlockState state, BlockPos pos, Player player) {
-    if (!(serverLevel.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity)) return false;
-
-    ItemStack item = blockEntity.removeTheItem();
-    if (item.isEmpty()) return false;
-
-    if (!player.addItem(item)) player.drop(item, false);
-    player.swing(InteractionHand.MAIN_HAND, true);
-    playStorageEffects(serverLevel, state, pos, MainRegistry.EXTRACT_ITEM.get(), 0.6F, 1.0F);
-    serverLevel.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-    return true;
-  }
-
-  private static void playStorageEffects(ServerLevel serverLevel, BlockState state, BlockPos pos, SoundEvent sound, float volume, float pitch) {
-    serverLevel.playSound(null, pos, sound, SoundSource.BLOCKS, volume, pitch);
-    sendFluffFromServer(serverLevel, pos, state.getValue(ATTACHMENT));
-  }
-
   public boolean playInteractionEffects(ServerLevel serverLevel, BlockState state, BlockPos blockPos, Entity entity) {
     boolean hasStoredItem = hasStoredItem(serverLevel, blockPos);
 
@@ -148,23 +201,6 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
     this.startCooldown(state, serverLevel, blockPos);
     serverLevel.gameEvent(entity, GameEvent.BLOCK_ACTIVATE, blockPos);
     return true;
-  }
-
-  private static boolean hasStoredItem(Level level, BlockPos pos) {
-    return level.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity && !blockEntity.getTheItem().isEmpty();
-  }
-
-  private static void sendFluffFromServer(ServerLevel level, BlockPos pos, Direction attachment) {
-    Direction.Axis axis = attachment.getAxis();
-    double plane = attachment.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 0.12 : 0.88;
-    double x = pos.getX() + (axis == Direction.Axis.X ? plane : 0.5);
-    double y = pos.getY() + (axis == Direction.Axis.Y ? plane : 0.5);
-    double z = pos.getZ() + (axis == Direction.Axis.Z ? plane : 0.5);
-    double xSpread = axis == Direction.Axis.X ? 0.03 : 0.25;
-    double ySpread = axis == Direction.Axis.Y ? 0.03 : 0.25;
-    double zSpread = axis == Direction.Axis.Z ? 0.03 : 0.25;
-
-    level.sendParticles(ParticleTypes.SNOWFLAKE, x, y, z, 5, xSpread, ySpread, zSpread, 0.01);
   }
 
   public void startCooldown(BlockState state, Level level, BlockPos pos) {
@@ -194,45 +230,14 @@ public abstract class BasePlushable extends Block implements SimpleWaterloggedBl
   }
 
   @Override
+  protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+    Containers.updateNeighboursAfterDestroy(state, level, pos);
+  }
+
+  @Override
   protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, Orientation orientation, boolean movedByPiston) {
     if (level instanceof ServerLevel serverLevel && tryExplodeStoredTnt(serverLevel, pos)) return;
     super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
-  }
-
-  private static boolean tryExplodeStoredTnt(ServerLevel serverLevel, BlockPos pos) {
-    if (!PlushablesConfig.storedTntExplosionsEnabled()) return false;
-    if (!serverLevel.hasNeighborSignal(pos)) return false;
-    if (!(serverLevel.getBlockEntity(pos) instanceof BasePlushableBlockEntity blockEntity)) return false;
-    if (!blockEntity.getTheItem().is(Blocks.TNT.asItem())) return false;
-    if (!serverLevel.getGameRules().get(GameRules.TNT_EXPLODES)) return false;
-
-    serverLevel.removeBlock(pos, false);
-    serverLevel.sendParticles(ParticleTypes.SNOWFLAKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 90, 1.0, 1.0, 1.0, 0.08);
-    serverLevel.explode(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 3.0F, Level.ExplosionInteraction.TNT);
-    return true;
-  }
-
-  private static boolean canInteractWithStoredItems(Player player) {
-    return PlushablesConfig.storageSystemEnabled() && player.gameMode() != GameType.ADVENTURE;
-  }
-
-  private static boolean canStoreInPlushable(ItemStack stack) {
-    if (stack.getItem() instanceof PlushableBlockItem) {
-      return !isTotallyStuffed(stack) && StoredItemComponentAllowlist.allows(stack, DataComponents.CONTAINER);
-    }
-    return StoredItemComponentAllowlist.allows(stack);
-  }
-
-  public static boolean isTotallyStuffed(ItemStack stack) {
-    for (int depth = 0; depth < 8; depth++) {
-      if (!(stack.getItem() instanceof PlushableBlockItem)) return false;
-      stack = storedPlushableItem(stack);
-    }
-    return true;
-  }
-
-  public static ItemStack storedPlushableItem(ItemStack stack) {
-    return stack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyOne();
   }
 
   /**
