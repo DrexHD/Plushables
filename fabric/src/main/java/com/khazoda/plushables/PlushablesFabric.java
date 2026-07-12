@@ -12,6 +12,7 @@ public class PlushablesFabric implements ModInitializer {
   public void onInitialize() {
     PlushablesCommon.init();
     KhazRegFabric.init(MainRegistry::init);
+    PlushablesFabricStorage.init();
     CreativeModeTabEvents.modifyOutputEvent(MainRegistry.PLUSHABLES_TAB.key()).register(output -> MainRegistry.addMainTabItems(output::accept));
     LootTableModificationFabric.init();
   }

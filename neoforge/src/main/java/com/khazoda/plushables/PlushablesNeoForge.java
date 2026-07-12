@@ -14,6 +14,7 @@ public class PlushablesNeoForge {
     PlushablesCommon.init();
     KhazConfigSyncNeoForge.registerPayloadHandlers(eventBus, Constants.CONFIG_SYNC);
     KhazRegNeoForge.init(eventBus, MainRegistry::init);
+    eventBus.addListener(PlushablesNeoForgeStorage::registerCapabilities);
     eventBus.addListener(this::onBuildCreativeModeTabContents);
   }
 

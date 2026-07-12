@@ -33,7 +33,15 @@ public class BasePlushableBlockEntity extends BlockEntity implements ContainerSi
 
   @Override
   public void setTheItem(ItemStack itemStack) {
+    this.setTheItemTransactionally(itemStack);
+    this.commitTheItemTransfer();
+  }
+
+  public void setTheItemTransactionally(ItemStack itemStack) {
     this.item = itemStack;
+  }
+
+  public void commitTheItemTransfer() {
     this.setChanged();
 
     if (this.level != null) {
@@ -75,6 +83,14 @@ public class BasePlushableBlockEntity extends BlockEntity implements ContainerSi
   @Override
   public boolean canTakeItem(Container into, int slot, ItemStack itemStack) {
     return PlushablesConfig.storageSystemEnabled();
+  }
+
+  public boolean canTransferInsert(ItemStack itemStack) {
+    return this.canPlaceItem(0, itemStack);
+  }
+
+  public boolean canTransferExtract(ItemStack itemStack) {
+    return PlushablesConfig.storageSystemEnabled() && !itemStack.isEmpty();
   }
 
   @Override
