@@ -46,7 +46,7 @@ public final class PlushablesNeoForgeStorage {
 
     @Override
     protected boolean isValid(ItemResource resource) {
-      return this.blockEntity.canTransferInsert(resource.toStack());
+      return this.blockEntity.canTransferAccept(resource.toStack());
     }
 
     @Override

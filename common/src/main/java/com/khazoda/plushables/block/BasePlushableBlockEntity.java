@@ -89,6 +89,10 @@ public class BasePlushableBlockEntity extends BlockEntity implements ContainerSi
     return !itemStack.isEmpty() && this.canPlaceItem(0, itemStack);
   }
 
+  public boolean canTransferAccept(ItemStack itemStack) {
+    return PlushablesConfig.storageSystemEnabled() && !itemStack.isEmpty() && BasePlushable.canStoreInPlushable(itemStack);
+  }
+
   public boolean canTransferExtract(ItemStack itemStack) {
     return PlushablesConfig.storageSystemEnabled() && !itemStack.isEmpty();
   }
