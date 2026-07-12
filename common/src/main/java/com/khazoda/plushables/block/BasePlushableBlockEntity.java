@@ -86,7 +86,7 @@ public class BasePlushableBlockEntity extends BlockEntity implements ContainerSi
   }
 
   public boolean canTransferInsert(ItemStack itemStack) {
-    return this.canPlaceItem(0, itemStack);
+    return !itemStack.isEmpty() && this.canPlaceItem(0, itemStack);
   }
 
   public boolean canTransferExtract(ItemStack itemStack) {
