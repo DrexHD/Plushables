@@ -33,6 +33,18 @@ public class PlushablesAdvancementProvider extends AdvancementProvider {
   }
 
   private static class PlushablesAdvancements implements AdvancementSubProvider {
+    private static AdvancementRewards plushableRecipeRewards(List<BlockEntry<BasePlushable, PlushableBlockItem>> plushables) {
+      AdvancementRewards.Builder rewards = new AdvancementRewards.Builder();
+      for (BlockEntry<BasePlushable, PlushableBlockItem> plushable : plushables) {
+        rewards.addRecipe(recipeKey(plushable.item().id()));
+      }
+      return rewards.build();
+    }
+
+    private static ResourceKey<Recipe<?>> recipeKey(Identifier id) {
+      return ResourceKey.create(Registries.RECIPE, id);
+    }
+
     @Override
     public void generate(HolderLookup.Provider registries, Consumer<AdvancementHolder> output) {
       List<BlockEntry<BasePlushable, PlushableBlockItem>> plushables = MainRegistry.ALL_PLUSHABLES;
@@ -100,18 +112,6 @@ public class PlushablesAdvancementProvider extends AdvancementProvider {
         int advancementNumber = (start / PLUSHABLES_PER_ADVANCEMENT) + 1;
         output.accept(builder.build(Constants.ID("plushables/collection_%02d".formatted(advancementNumber))));
       }
-    }
-
-    private static AdvancementRewards plushableRecipeRewards(List<BlockEntry<BasePlushable, PlushableBlockItem>> plushables) {
-      AdvancementRewards.Builder rewards = new AdvancementRewards.Builder();
-      for (BlockEntry<BasePlushable, PlushableBlockItem> plushable : plushables) {
-        rewards.addRecipe(recipeKey(plushable.item().id()));
-      }
-      return rewards.build();
-    }
-
-    private static ResourceKey<Recipe<?>> recipeKey(Identifier id) {
-      return ResourceKey.create(Registries.RECIPE, id);
     }
   }
 }

@@ -23,7 +23,8 @@ public class AdvancementNodeMixin {
 
   @Inject(method = "<init>", at = @At("RETURN"))
   private void plushables$preserveChildInsertionOrder(AdvancementHolder holder, AdvancementNode parent, CallbackInfo ci) {
-    if (!Constants.MOD_ID.equals(holder.id().getNamespace()) || children instanceof ReferenceLinkedOpenHashSet<?>) return;
+    if (!Constants.MOD_ID.equals(holder.id().getNamespace()) || children instanceof ReferenceLinkedOpenHashSet<?>)
+      return;
     // Keep plushables advancement siblings in declaration order so numbering goes bottom to top (instead of random).
     children = new ReferenceLinkedOpenHashSet<>(children);
   }

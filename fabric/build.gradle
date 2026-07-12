@@ -72,14 +72,14 @@ tasks.register('cleanGeneratedResourcesFromLoaderOutputs') {
                 }
 
                 fileTree(namespaceDir)
-                    .visit { details ->
-                        if (details.isDirectory()) {
-                            File dir = details.file
-                            if (dir.exists() && dir.listFiles()?.length == 0) {
-                                dir.delete()
+                        .visit { details ->
+                            if (details.isDirectory()) {
+                                File dir = details.file
+                                if (dir.exists() && dir.listFiles()?.length == 0) {
+                                    dir.delete()
+                                }
                             }
                         }
-                    }
 
                 if (namespaceDir.listFiles()?.length == 0) {
                     namespaceDir.delete()
@@ -120,7 +120,7 @@ def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', Strin
     }
 }
 sourceSets.configureEach {
-    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant->
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant ->
         configurations.named("$variant") {
             attributes {
                 attribute(loaderAttribute, 'fabric')

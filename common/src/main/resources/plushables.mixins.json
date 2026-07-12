@@ -8,9 +8,7 @@
     "AdvancementNodeMixin"
   ],
   "client": [
-    "HumanoidMobRendererMixin",
-    "HumanoidModelMixin",
-    "HumanoidRenderStateMixin"
+    "HumanoidMobRendererMixin", "HumanoidModelMixin", "HumanoidRenderStateMixin"
   ],
   "server": [],
   "injectors": {

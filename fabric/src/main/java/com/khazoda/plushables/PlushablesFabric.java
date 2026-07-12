@@ -1,8 +1,8 @@
 package com.khazoda.plushables;
 
-import com.khazoda.plushables.registry.MainRegistry;
 import com.khazoda.core.reg.KhazRegFabric;
 import com.khazoda.plushables.loot.LootTableModificationFabric;
+import com.khazoda.plushables.registry.MainRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 

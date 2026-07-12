@@ -13,11 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class PlushableOrientationModel implements BlockStateModel {
@@ -27,6 +23,12 @@ public final class PlushableOrientationModel implements BlockStateModel {
   private final List<BlockStateModelPart> parts;
   private final Material.Baked particleMaterial;
   private final int materialFlags;
+
+  private PlushableOrientationModel(BlockStateModel model, BlockState state) {
+    this.parts = orientParts(model, VoxelShapeHelper.Orientation.of(state.getValue(BasePlushable.ATTACHMENT), state.getValue(BasePlushable.ROTATION)));
+    this.particleMaterial = model.particleMaterial();
+    this.materialFlags = model.materialFlags();
+  }
 
   public static boolean isPlushableBlockState(BlockState state) {
     return state.getBlock() instanceof BasePlushable;
@@ -56,12 +58,6 @@ public final class PlushableOrientationModel implements BlockStateModel {
     int orientation = VoxelShapeHelper.orientationIndex(state.getValue(BasePlushable.ATTACHMENT), state.getValue(BasePlushable.ROTATION));
     return cache.computeIfAbsent(state.getBlock(), ignored -> new ConcurrentHashMap<>())
         .computeIfAbsent(orientation, ignored -> new PlushableOrientationModel(model, state));
-  }
-
-  private PlushableOrientationModel(BlockStateModel model, BlockState state) {
-    this.parts = orientParts(model, VoxelShapeHelper.Orientation.of(state.getValue(BasePlushable.ATTACHMENT), state.getValue(BasePlushable.ROTATION)));
-    this.particleMaterial = model.particleMaterial();
-    this.materialFlags = model.materialFlags();
   }
 
   private static List<BlockStateModelPart> orientParts(BlockStateModel model, VoxelShapeHelper.Orientation orientation) {
@@ -107,6 +103,10 @@ public final class PlushableOrientationModel implements BlockStateModel {
         quads[sideIndex(orientation.transform(source))] = transformAll(part.getQuads(source));
       }
       quads[sideIndex(null)] = transformAll(part.getQuads(null));
+    }
+
+    private static int sideIndex(@Nullable Direction side) {
+      return side == null ? SIDE_COUNT - 1 : side.ordinal();
     }
 
     @Override
@@ -155,10 +155,6 @@ public final class PlushableOrientationModel implements BlockStateModel {
     @Override
     public int materialFlags() {
       return materialFlags;
-    }
-
-    private static int sideIndex(@Nullable Direction side) {
-      return side == null ? SIDE_COUNT - 1 : side.ordinal();
     }
   }
 }

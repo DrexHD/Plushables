@@ -17,7 +17,7 @@ public abstract class HumanoidMobRendererMixin {
       at = @At("RETURN")
   )
   private static void addItemState(LivingEntity entity, HumanoidRenderState reusedState, float partialTick, ItemModelResolver itemModelResolver, CallbackInfo ci) {
-    ((IHumanoidRenderState)reusedState).plushables$setMainHandItem(entity.getMainHandItem().copy());
-    ((IHumanoidRenderState)reusedState).plushables$setOffHandItem(entity.getOffhandItem().copy());
+    ((IHumanoidRenderState) reusedState).plushables$setMainHandItem(entity.getMainHandItem().copy());
+    ((IHumanoidRenderState) reusedState).plushables$setOffHandItem(entity.getOffhandItem().copy());
   }
 }

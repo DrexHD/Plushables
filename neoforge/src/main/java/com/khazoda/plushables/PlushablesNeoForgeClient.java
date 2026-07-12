@@ -5,8 +5,8 @@ import com.khazoda.plushables.client.model.PlushableOrientationModel;
 import com.khazoda.plushables.registry.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.ModelEvent;
 
 import java.util.function.Supplier;
 

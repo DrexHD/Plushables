@@ -6,11 +6,12 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public final class VoxelShapeHelper {
+  public static final int ORIENTATIONS_PER_FACE = 4;
   private static final Direction[] DIRECTIONS = Direction.values();
   public static final int DIRECTION_COUNT = DIRECTIONS.length;
-  public static final int ORIENTATIONS_PER_FACE = 4;
 
-  private VoxelShapeHelper() {}
+  private VoxelShapeHelper() {
+  }
 
   /**
    * Calculates every cached plushable shape orientation.

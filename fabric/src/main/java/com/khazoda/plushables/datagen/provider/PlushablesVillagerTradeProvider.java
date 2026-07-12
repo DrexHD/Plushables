@@ -39,18 +39,6 @@ public class PlushablesVillagerTradeProvider extends FabricCodecDataProvider<Vil
     return ResourceKey.create(Registries.VILLAGER_TRADE, ID("shepherd/5/" + plushable.item().id().getPath()));
   }
 
-  @Override
-  protected void configure(BiConsumer<Identifier, VillagerTrade> provider, HolderLookup.Provider lookup) {
-    for (BlockEntry<BasePlushable, PlushableBlockItem> plushable : MainRegistry.ALL_PLUSHABLES) {
-      provider.accept(keyFor(plushable).identifier(), createTrade(plushable));
-    }
-  }
-
-  @Override
-  public String getName() {
-    return "Plushables Villager Trades";
-  }
-
   private static VillagerTrade createTrade(BlockEntry<BasePlushable, PlushableBlockItem> plushable) {
     return new VillagerTrade(
         new TradeCost(Items.EMERALD, PLUSHABLE_EMERALD_COST),
@@ -62,5 +50,17 @@ public class PlushablesVillagerTradeProvider extends FabricCodecDataProvider<Vil
         Optional.empty(),
         List.of()
     );
+  }
+
+  @Override
+  protected void configure(BiConsumer<Identifier, VillagerTrade> provider, HolderLookup.Provider lookup) {
+    for (BlockEntry<BasePlushable, PlushableBlockItem> plushable : MainRegistry.ALL_PLUSHABLES) {
+      provider.accept(keyFor(plushable).identifier(), createTrade(plushable));
+    }
+  }
+
+  @Override
+  public String getName() {
+    return "Plushables Villager Trades";
   }
 }
