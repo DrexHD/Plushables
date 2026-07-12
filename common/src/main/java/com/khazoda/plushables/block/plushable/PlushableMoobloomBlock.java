@@ -16,7 +16,7 @@ public class PlushableMoobloomBlock extends BasePlushable {
     super(settings,
         TooltipDataBuilder.create()
             .number(30)
-            .artist("MerchantPug")
+            .artist("ChrysanthCow")
             .creationDate("19th August 2023")
             .trivia("If you love mooblooms you'll adore the Bovines and Buttercups mod")
             .build(),

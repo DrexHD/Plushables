@@ -24,7 +24,7 @@ The following plushie designs are created by other talented creators and are inc
 
 - **Conductor** by the [Steam n' Rails](https://modrinth.com/mod/create-steam-n-rails) team
 - **Animatronic** by [Sammie](https://modrinth.com/user/Sammy)
-- **Moobloom** by [MerchantPug](https://modrinth.com/user/pug)
+- **Moobloom** by [ChrysanthCow](https://modrinth.com/user/84zsGbft)
 - **Blåhaj** by [hibi](https://modrinth.com/user/hibi)
 - **Ribbit** by [Joosh](https://modrinth.com/user/Joo5h)
 - **Stoneling** by [wiiv](https://modrinth.com/mod/quark)
