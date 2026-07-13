@@ -1,6 +1,6 @@
-![plushables banner](/common/src/main/resources/assets/plushables/banner.png)
+![plushables banner](https://cdn.modrinth.com/data/cached_images/c0717d3cea9c7e458b0cd062be0220282339bc2c.webp)
 
-<h1 align="center" style="display: block; margin-bottom: 10px; text-align: center;">
+<h1 align="center" style="text-align: center;">
   <div>
     <a href="https://discord.gg/vEZUkSxwR9">
       <img alt="Discord" src="https://img.shields.io/discord/1272157572379574343?logo=Discord&logoColor=1C1C1C&label=%20&labelColor=5865F2&color=2C2C2C">
