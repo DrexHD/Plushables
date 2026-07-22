@@ -1,5 +1,6 @@
 package com.khazoda.plushables.registry;
 
+import com.khazoda.plushables.PlushablesConfig;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
@@ -63,6 +64,7 @@ public final class LootTables {
   }
 
   public static boolean modifyLootTable(Identifier id, LootTable.Builder tableBuilder) {
+    if (!PlushablesConfig.lootTablePopulationEnabled()) return false;
     LootConfig config = LOOT_TABLE_CONFIGS.get(ResourceKey.create(LOOT_TABLE, id));
     if (config == null) {
       return false;

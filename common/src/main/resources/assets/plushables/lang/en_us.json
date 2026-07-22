@@ -66,5 +66,6 @@
   "advancements.plushables.collection.title": "#%s - #%s",
   "advancements.plushables.collection.description": "Collect plushables %s through %s.",
   "config.plushables.enable_storage_system": "Plushable Storage",
-  "config.plushables.enable_stored_tnt_explosions": "Stored TNT Explosions"
+  "config.plushables.enable_stored_tnt_explosions": "Stored TNT Explosions",
+  "config.plushables.enable_loot_table_population": "Vanilla Loot Table Population"
 }
